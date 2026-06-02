@@ -1,0 +1,93 @@
+package com.example.login_app;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+import java.util.ArrayList;
+import java.util.List;
+
+public class ProductListActivity extends AppCompatActivity {
+
+    private GridView gridView;
+    private TextView tvCartBadge;
+    private List<Product> products = new ArrayList<>();
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_product_list);
+
+        gridView = findViewById(R.id.grid_products);
+        tvCartBadge = findViewById(R.id.tv_cart_badge);
+
+        initProducts();
+        gridView.setAdapter(new ProductAdapter());
+
+        gridView.setOnItemClickListener((parent, view, position, id) -> {
+            Product p = products.get(position);
+            CartManager.getInstance().add(p);
+            updateBadge();
+            Toast.makeText(this, p.getName() + " 已加入购物车", Toast.LENGTH_SHORT).show();
+        });
+
+        findViewById(R.id.btn_cart).setOnClickListener(v ->
+                startActivity(new Intent(this, CartActivity.class)));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateBadge();
+    }
+
+    private void updateBadge() {
+        int count = CartManager.getInstance().getCount();
+        if (count > 0) {
+            tvCartBadge.setVisibility(View.VISIBLE);
+            tvCartBadge.setText(String.valueOf(count));
+        } else {
+            tvCartBadge.setVisibility(View.GONE);
+        }
+    }
+
+    private void initProducts() {
+        products.add(new Product(1, "无线蓝牙耳机", "降噪长续航 高品质音质", 199.00, R.drawable.ic_product));
+        products.add(new Product(2, "运动跑鞋", "透气减震 轻便舒适", 299.00, R.drawable.ic_product));
+        products.add(new Product(3, "双肩背包", "大容量 防水耐磨", 159.00, R.drawable.ic_product));
+        products.add(new Product(4, "保温杯", "316不锈钢 500ml", 89.00, R.drawable.ic_product));
+        products.add(new Product(5, "机械键盘", "青轴 RGB背光 87键", 349.00, R.drawable.ic_product));
+        products.add(new Product(6, "充电宝", "20000mAh 快充", 129.00, R.drawable.ic_product));
+        products.add(new Product(7, "遮阳帽", "防晒透气 可折叠", 49.00, R.drawable.ic_product));
+        products.add(new Product(8, "T恤", "纯棉 宽松版型 多色可选", 79.00, R.drawable.ic_product));
+    }
+
+    private class ProductAdapter extends BaseAdapter {
+        @Override
+        public int getCount() { return products.size(); }
+        @Override
+        public Object getItem(int position) { return products.get(position); }
+        @Override
+        public long getItemId(int position) { return position; }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (convertView == null) {
+                convertView = LayoutInflater.from(ProductListActivity.this)
+                        .inflate(R.layout.item_product, parent, false);
+            }
+            Product p = products.get(position);
+            ((ImageView) convertView.findViewById(R.id.iv_product)).setImageResource(p.getImageResId());
+            ((TextView) convertView.findViewById(R.id.tv_name)).setText(p.getName());
+            ((TextView) convertView.findViewById(R.id.tv_price)).setText("¥" + p.getPrice());
+            return convertView;
+        }
+    }
+}
