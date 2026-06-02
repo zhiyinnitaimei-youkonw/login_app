@@ -5,6 +5,7 @@
     android:orientation="vertical"
     android:background="#F5F5F5">
 
+    <!-- Top bar -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="56dp"
@@ -49,6 +50,7 @@
         </LinearLayout>
     </RelativeLayout>
 
+    <!-- Product grid -->
     <GridView
         android:id="@+id/grid_products"
         android:layout_width="match_parent"

@@ -1,12 +1,7 @@
 package com.example.login_app;
 
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,7 +17,7 @@ public class CartActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_cart);
+        setContentView(R.layout.activity_shopping_cart);
 
         listView = findViewById(R.id.list_cart);
         tvTotal = findViewById(R.id.tv_total);
@@ -30,7 +25,22 @@ public class CartActivity extends AppCompatActivity {
 
         findViewById(R.id.iv_back).setOnClickListener(v -> finish());
 
-        adapter = new CartAdapter();
+        adapter = new CartAdapter(this, CartManager.getInstance().getItems());
+        adapter.setOnCartChangeListener(new CartAdapter.OnCartChangeListener() {
+            @Override
+            public void onQuantityChanged(int productId, int newQty) {
+                CartManager.getInstance().updateQuantity(productId, newQty);
+                adapter.refresh();
+                updateTotal();
+            }
+
+            @Override
+            public void onItemRemoved(int productId) {
+                CartManager.getInstance().remove(productId);
+                adapter.refresh();
+                updateTotal();
+            }
+        });
         listView.setAdapter(adapter);
 
         btnCheckout.setOnClickListener(v -> {
@@ -47,60 +57,12 @@ public class CartActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        adapter.notifyDataSetChanged();
-        double total = CartManager.getInstance().getTotal();
-        tvTotal.setText("合计: ¥" + String.format("%.2f", total));
+        adapter.refresh();
+        updateTotal();
     }
 
-    private class CartAdapter extends BaseAdapter {
-        @Override
-        public int getCount() {
-            return CartManager.getInstance().getItems().size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return CartManager.getInstance().getItems().get(position);
-        }
-
-        @Override
-        public long getItemId(int position) { return position; }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            if (convertView == null) {
-                convertView = LayoutInflater.from(CartActivity.this)
-                        .inflate(R.layout.item_cart, parent, false);
-            }
-
-            final CartManager.CartItem item = CartManager.getInstance().getItems().get(position);
-            final Product p = item.product;
-
-            ((ImageView) convertView.findViewById(R.id.iv_product)).setImageResource(p.getImageResId());
-            ((TextView) convertView.findViewById(R.id.tv_name)).setText(p.getName());
-            ((TextView) convertView.findViewById(R.id.tv_price)).setText("¥" + p.getPrice());
-            TextView tvQty = convertView.findViewById(R.id.tv_qty);
-            tvQty.setText(String.valueOf(item.quantity));
-
-            convertView.findViewById(R.id.btn_minus).setOnClickListener(v -> {
-                CartManager.getInstance().updateQuantity(p.getId(), item.quantity - 1);
-                notifyDataSetChanged();
-                tvTotal.setText("合计: ¥" + String.format("%.2f", CartManager.getInstance().getTotal()));
-            });
-
-            convertView.findViewById(R.id.btn_plus).setOnClickListener(v -> {
-                CartManager.getInstance().updateQuantity(p.getId(), item.quantity + 1);
-                notifyDataSetChanged();
-                tvTotal.setText("合计: ¥" + String.format("%.2f", CartManager.getInstance().getTotal()));
-            });
-
-            convertView.findViewById(R.id.btn_delete).setOnClickListener(v -> {
-                CartManager.getInstance().remove(p.getId());
-                notifyDataSetChanged();
-                tvTotal.setText("合计: ¥" + String.format("%.2f", CartManager.getInstance().getTotal()));
-            });
-
-            return convertView;
-        }
+    private void updateTotal() {
+        double total = CartManager.getInstance().getTotal();
+        tvTotal.setText("合计: ¥" + String.format("%.2f", total));
     }
 }
