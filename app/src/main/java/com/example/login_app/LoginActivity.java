@@ -2,9 +2,7 @@ package com.example.login_app;
 
 import android.app.AlertDialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -27,7 +25,7 @@ public class LoginActivity extends AppCompatActivity {
     private Button btnLogin, btnGetSms;
     private View passwordArea, smsCodeArea, rememberArea;
 
-    private SharedPreferences prefs;
+    private UserDao userDao;
     private String generatedSmsCode;
 
     private static final int REQ_FORGOT_PASSWORD = 100;
@@ -37,7 +35,8 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        prefs = getSharedPreferences("login_prefs", MODE_PRIVATE);
+        // SQLite 数据持久化
+        userDao = new UserDao(this);
 
         rgLoginMode = findViewById(R.id.rg_login_mode);
         rbPassword = findViewById(R.id.rb_password);
@@ -58,7 +57,6 @@ public class LoginActivity extends AppCompatActivity {
         // 切换登录模式
         rgLoginMode.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.rb_password) {
-                // 密码登录模式
                 tvPasswordLabel.setVisibility(View.VISIBLE);
                 passwordArea.setVisibility(View.VISIBLE);
                 tvForgotPassword.setVisibility(View.VISIBLE);
@@ -66,7 +64,6 @@ public class LoginActivity extends AppCompatActivity {
                 tvSmsLabel.setVisibility(View.GONE);
                 smsCodeArea.setVisibility(View.GONE);
             } else {
-                // 验证码登录模式
                 tvPasswordLabel.setVisibility(View.GONE);
                 passwordArea.setVisibility(View.GONE);
                 tvForgotPassword.setVisibility(View.GONE);
@@ -76,13 +73,11 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        // 恢复记住的密码
-        loadRemembered();
+        // SQLite 恢复记住密码的用户
+        loadRememberedFromDb();
 
-        // 登录按钮
         btnLogin.setOnClickListener(v -> doLogin());
 
-        // 忘记密码 — 携带手机号跳转
         tvForgotPassword.setOnClickListener(v -> {
             String phone = etPhone.getText().toString().trim();
             if (phone.isEmpty()) {
@@ -94,7 +89,6 @@ public class LoginActivity extends AppCompatActivity {
             startActivityForResult(intent, REQ_FORGOT_PASSWORD);
         });
 
-        // 获取验证码
         btnGetSms.setOnClickListener(v -> sendSmsCode());
     }
 
@@ -113,15 +107,16 @@ public class LoginActivity extends AppCompatActivity {
                 showAlert("提示", "请输入密码");
                 return;
             }
-            if (cbRemember.isChecked()) {
-                prefs.edit().putString("phone", phone)
-                        .putString("password", password)
-                        .putBoolean("remember", true).apply();
-            } else {
-                prefs.edit().clear().apply();
-            }
 
-            showAlert("登录成功", "密码登录验证通过\n欢迎回来！\n手机号：" + phone);
+            // DML: INSERT/UPDATE 持久化到 SQLite
+            boolean remember = cbRemember.isChecked();
+            userDao.insertOrUpdate(phone, password, remember);
+            int userCount = userDao.getUserCount();
+
+            showAlert("登录成功",
+                    "密码登录验证通过\n欢迎回来！\n手机号：" + phone
+                            + "\n\n[SQLite] 记住密码: " + (remember ? "是" : "否")
+                            + "\n[SQLite] 用户总数: " + userCount);
             goToMain();
         } else {
             // 验证码登录
@@ -135,7 +130,10 @@ public class LoginActivity extends AppCompatActivity {
                 return;
             }
 
-            showAlert("登录成功", "验证码登录验证通过\n欢迎！\n手机号：" + phone);
+            int userCount = userDao.getUserCount();
+            showAlert("登录成功",
+                    "验证码登录验证通过\n欢迎！\n手机号：" + phone
+                            + "\n\n[SQLite] 用户总数: " + userCount);
             goToMain();
         }
     }
@@ -151,7 +149,6 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        // 模拟生成6位验证码
         generatedSmsCode = String.format("%06d", new Random().nextInt(999999));
         btnGetSms.setEnabled(false);
 
@@ -160,7 +157,6 @@ public class LoginActivity extends AppCompatActivity {
                 .setMessage("验证码已发送至 " + phone + "\n\n(模拟)验证码：" + generatedSmsCode + "\n\n请在60秒内输入验证码")
                 .setPositiveButton("确定", (d, w) -> {
                     etSmsCode.requestFocus();
-                    // 60秒后恢复按钮
                     btnGetSms.postDelayed(() -> btnGetSms.setEnabled(true), 60000);
                 })
                 .show();
@@ -171,20 +167,35 @@ public class LoginActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQ_FORGOT_PASSWORD && resultCode == RESULT_OK && data != null) {
             String newPassword = data.getStringExtra("new_password");
+            String phone = etPhone.getText().toString().trim();
             if (newPassword != null) {
                 etPassword.setText(newPassword);
-                // 切换回密码模式
+                // DML: 同步更新 SQLite 中的密码
+                if (!phone.isEmpty()) {
+                    UserDao.UserInfo user = userDao.getByPhone(phone);
+                    if (user != null) {
+                        userDao.updatePassword(phone, newPassword);
+                    } else {
+                        userDao.insertOrUpdate(phone, newPassword, false);
+                    }
+                }
                 rbPassword.setChecked(true);
-                showAlert("密码已重置", "新密码已填入，请使用新密码登录");
+                showAlert("密码已重置",
+                        "新密码已填入，请使用新密码登录"
+                                + "\n\n[SQLite] 数据库已同步更新");
             }
         }
     }
 
-    private void loadRemembered() {
-        boolean remember = prefs.getBoolean("remember", false);
-        if (remember) {
-            etPhone.setText(prefs.getString("phone", ""));
-            etPassword.setText(prefs.getString("password", ""));
+    /**
+     * 从 SQLite 数据库恢复记住密码的用户
+     * SELECT * FROM user WHERE remember=1 LIMIT 1;
+     */
+    private void loadRememberedFromDb() {
+        UserDao.UserInfo remembered = userDao.getRememberedUser();
+        if (remembered != null) {
+            etPhone.setText(remembered.phone);
+            etPassword.setText(remembered.password);
             cbRemember.setChecked(true);
         }
     }
