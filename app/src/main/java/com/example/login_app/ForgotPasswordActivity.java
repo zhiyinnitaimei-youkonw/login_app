@@ -1,130 +1,117 @@
 package com.example.login_app;
 
-import android.os.AsyncTask;
+import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-
-import java.util.Properties;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
+import java.util.Random;
 
 public class ForgotPasswordActivity extends AppCompatActivity {
 
-    private EditText etEmail;
-    private Button btnSendEmail;
+    private TextView tvPhone;
+    private EditText etNewPassword, etConfirmPassword, etSmsCode;
+    private Button btnGetCode, btnConfirm;
 
-    private static final String SENDER_EMAIL = "***@qq.com";
-    private static final String SENDER_PASSWORD = "***REMOVED***";
-    private static final String SMTP_HOST = "smtp.qq.com";
-    private static final int SMTP_PORT = 465;
+    private String phone;
+    private String generatedCode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forgot_password);
 
-        etEmail = findViewById(R.id.et_email);
-        btnSendEmail = findViewById(R.id.btn_send_email);
+        // 接收登录页传来的手机号
+        phone = getIntent().getStringExtra("phone");
+        if (phone == null || phone.isEmpty()) {
+            phone = "未提供手机号";
+        }
 
-        btnSendEmail.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String email = etEmail.getText().toString().trim();
+        tvPhone = findViewById(R.id.tv_phone_display);
+        etNewPassword = findViewById(R.id.et_new_password);
+        etConfirmPassword = findViewById(R.id.et_confirm_password);
+        etSmsCode = findViewById(R.id.et_sms_code);
+        btnGetCode = findViewById(R.id.btn_get_code);
+        btnConfirm = findViewById(R.id.btn_confirm);
 
-                if (email.isEmpty()) {
-                    Toast.makeText(ForgotPasswordActivity.this, "请输入邮箱地址", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+        tvPhone.setText("手机号：" + phone);
 
-                if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                    Toast.makeText(ForgotPasswordActivity.this, "请输入有效的邮箱地址", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+        findViewById(R.id.iv_back).setOnClickListener(v -> finish());
 
-                new SendEmailTask().execute(email);
-            }
-        });
+        // 获取验证码
+        btnGetCode.setOnClickListener(v -> sendVerificationCode());
+
+        // 确认修改
+        btnConfirm.setOnClickListener(v -> confirmReset());
     }
 
-    private class SendEmailTask extends AsyncTask<String, Void, Boolean> {
+    private void sendVerificationCode() {
+        // 模拟发送短信验证码
+        generatedCode = String.format("%06d", new Random().nextInt(999999));
+        btnGetCode.setEnabled(false);
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            btnSendEmail.setEnabled(false);
-            Toast.makeText(ForgotPasswordActivity.this, "正在发送邮件...", Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        protected Boolean doInBackground(String... params) {
-            String recipientEmail = params[0];
-
-            Properties props = new Properties();
-            props.put("mail.smtp.auth", "true");
-            props.put("mail.smtp.host", SMTP_HOST);
-            props.put("mail.smtp.port", SMTP_PORT);
-            props.put("mail.smtp.socketFactory.port", SMTP_PORT);
-            props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-            props.put("mail.smtp.socketFactory.fallback", "false");
-
-            Session session = Session.getInstance(props,
-                    new javax.mail.Authenticator() {
-                        protected PasswordAuthentication getPasswordAuthentication() {
-                            return new PasswordAuthentication(SENDER_EMAIL, SENDER_PASSWORD);
-                        }
-                    });
-
-            try {
-                MimeMessage message = new MimeMessage(session);
-                message.setFrom(new InternetAddress(SENDER_EMAIL));
-                message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipientEmail));
-                message.setSubject("找回密码 - 喜马拉雅");
-
-                String verificationCode = generateVerificationCode();
-                String emailContent = "亲爱的用户，您好！\n\n" +
-                        "您正在尝试找回密码。您的验证码是：" + verificationCode + "\n\n" +
-                        "该验证码10分钟内有效，请尽快完成验证。\n\n" +
-                        "如果您没有发起此请求，请忽略此邮件。\n\n" +
-                        "感谢您的使用！\n" +
-                        "喜马拉雅团队";
-
-                message.setText(emailContent);
-                Transport.send(message);
-                return true;
-
-            } catch (MessagingException e) {
-                e.printStackTrace();
-                return false;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Boolean success) {
-            super.onPostExecute(success);
-            btnSendEmail.setEnabled(true);
-
-            if (success) {
-                Toast.makeText(ForgotPasswordActivity.this, "邮件已发送，请查收", Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(ForgotPasswordActivity.this, "邮件发送失败，请检查网络或邮箱设置", Toast.LENGTH_LONG).show();
-            }
-        }
+        new AlertDialog.Builder(this)
+                .setTitle("短信已发送")
+                .setMessage("验证码已发送至 " + phone + "\n\n(模拟)验证码：" + generatedCode + "\n\n请在60秒内完成验证")
+                .setPositiveButton("确定", (d, w) -> {
+                    etSmsCode.requestFocus();
+                    btnGetCode.postDelayed(() -> btnGetCode.setEnabled(true), 60000);
+                })
+                .show();
     }
 
-    private String generateVerificationCode() {
-        StringBuilder code = new StringBuilder();
-        for (int i = 0; i < 6; i++) {
-            code.append((int) (Math.random() * 10));
+    private void confirmReset() {
+        String newPwd = etNewPassword.getText().toString().trim();
+        String confirmPwd = etConfirmPassword.getText().toString().trim();
+        String code = etSmsCode.getText().toString().trim();
+
+        if (newPwd.isEmpty() || confirmPwd.isEmpty()) {
+            showAlert("提示", "请输入新密码和确认密码");
+            return;
         }
-        return code.toString();
+        if (newPwd.length() < 6) {
+            showAlert("提示", "密码长度不能少于6位");
+            return;
+        }
+        if (!newPwd.equals(confirmPwd)) {
+            showAlert("提示", "两次输入的密码不一致");
+            return;
+        }
+        if (code.isEmpty()) {
+            showAlert("提示", "请输入短信验证码");
+            return;
+        }
+        if (generatedCode == null || !generatedCode.equals(code)) {
+            showAlert("验证失败", "验证码错误，请重新输入");
+            return;
+        }
+
+        // 验证通过，通过setResult将新密码传回登录页
+        showAlert("修改成功", "密码已重置\n\n请使用新密码登录");
+        Intent result = new Intent();
+        result.putExtra("new_password", newPwd);
+        setResult(RESULT_OK, result);
+        finish();
+    }
+
+    private void showAlert(String title, String message) {
+        new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("确定", (d, w) -> {
+                    if (title.equals("修改成功")) {
+                        // 已经在上面 setResult 和 finish 了
+                        // 但AlertDialog dismiss后需要finish，这里做个判断
+                    }
+                })
+                .setOnDismissListener(d -> {
+                    if (title.equals("修改成功")) {
+                        // 防止重复finish
+                    }
+                })
+                .show();
     }
 }
