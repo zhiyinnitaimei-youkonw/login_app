@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F5F5F5">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@color/primary"
+        android:padding="12dp">
+
+        <ImageView
+            android:id="@+id/iv_back"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@android:drawable/ic_menu_revert"
+            android:layout_centerVertical="true"/>
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="新增地址"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_centerInParent="true"/>
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/card_bg"
+            android:padding="16dp">
+
+            <TextView android:text="收货人" android:textSize="14sp" android:textColor="@color/black"/>
+            <EditText android:id="@+id/et_name" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:hint="请输入收货人姓名"
+                android:inputType="text" android:padding="12dp"
+                android:background="@drawable/edittext_bg" android:textSize="15sp"/>
+
+            <TextView android:text="手机号码" android:textSize="14sp"
+                android:textColor="@color/black" android:layout_marginTop="16dp"/>
+            <EditText android:id="@+id/et_phone" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:hint="请输入手机号码"
+                android:inputType="phone" android:padding="12dp"
+                android:background="@drawable/edittext_bg" android:textSize="15sp"/>
+
+            <TextView android:text="省" android:textSize="14sp"
+                android:textColor="@color/black" android:layout_marginTop="16dp"/>
+            <EditText android:id="@+id/et_province" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:hint="请输入省份"
+                android:inputType="text" android:padding="12dp"
+                android:background="@drawable/edittext_bg" android:textSize="15sp"/>
+
+            <TextView android:text="市" android:textSize="14sp"
+                android:textColor="@color/black" android:layout_marginTop="16dp"/>
+            <EditText android:id="@+id/et_city" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:hint="请输入城市"
+                android:inputType="text" android:padding="12dp"
+                android:background="@drawable/edittext_bg" android:textSize="15sp"/>
+
+            <TextView android:text="区/县" android:textSize="14sp"
+                android:textColor="@color/black" android:layout_marginTop="16dp"/>
+            <EditText android:id="@+id/et_district" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:hint="请输入区/县"
+                android:inputType="text" android:padding="12dp"
+                android:background="@drawable/edittext_bg" android:textSize="15sp"/>
+
+            <TextView android:text="详细地址" android:textSize="14sp"
+                android:textColor="@color/black" android:layout_marginTop="16dp"/>
+            <EditText android:id="@+id/et_detail" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:hint="请输入详细地址，如街道、门牌号等"
+                android:inputType="text" android:padding="12dp"
+                android:background="@drawable/edittext_bg" android:textSize="15sp"/>
+        </LinearLayout>
+    </ScrollView>
+
+    <Button
+        android:id="@+id/btn_save"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="保存"
+        android:textSize="16sp"
+        android:backgroundTint="#FF6600"
+        android:layout_margin="16dp"/>
+
+</LinearLayout>

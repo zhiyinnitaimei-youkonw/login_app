@@ -38,6 +38,9 @@ public class ProductListActivity extends AppCompatActivity {
 
         findViewById(R.id.btn_cart).setOnClickListener(v ->
                 startActivity(new Intent(this, CartActivity.class)));
+
+        findViewById(R.id.btn_user).setOnClickListener(v ->
+                startActivity(new Intent(this, UserProfileActivity.class)));
     }
 
     @Override

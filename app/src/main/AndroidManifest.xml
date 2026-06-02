@@ -20,6 +20,9 @@
         <activity android:name=".ForgotPasswordActivity" />
         <activity android:name=".ProductListActivity" />
         <activity android:name=".CartActivity" />
+        <activity android:name=".UserProfileActivity" />
+        <activity android:name=".AddressListActivity" />
+        <activity android:name=".AddressEditActivity" />
     </application>
 
 </manifest>
