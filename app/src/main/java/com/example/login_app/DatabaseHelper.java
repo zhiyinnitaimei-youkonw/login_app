@@ -6,16 +6,16 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 /**
- * SQLite数据库助手 — DDL（数据定义语言）
- * 四个本地持久化表: user / cart / profile / address
+ * SQLite数据库助手 — DDL + 版本迁移
+ * 四表: user(邮箱注册) / cart(购物车) / profile(昵称头像) / address(收货地址)
  */
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String TAG = "DatabaseHelper";
     private static final String DB_NAME = "login_app.db";
-    private static final int DB_VERSION = 2;
+    private static final int DB_VERSION = 3;
 
-    // ========== 用户表 ==========
+    // ==== 列名 ====
     public static final String TABLE_USER = "user";
     public static final String COL_USER_ID = "_id";
     public static final String COL_USER_EMAIL = "email";
@@ -23,7 +23,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_USER_REMEMBER = "remember";
     public static final String COL_USER_UPDATED = "updated_at";
 
-    // ========== 购物车表 ==========
     public static final String TABLE_CART = "cart";
     public static final String COL_CART_ID = "_id";
     public static final String COL_CART_PRODUCT_ID = "product_id";
@@ -31,13 +30,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_CART_PRICE = "product_price";
     public static final String COL_CART_QTY = "quantity";
 
-    // ========== 用户资料表 ==========
     public static final String TABLE_PROFILE = "profile";
     public static final String COL_PROFILE_ID = "_id";
     public static final String COL_PROFILE_NICKNAME = "nickname";
     public static final String COL_PROFILE_AVATAR = "avatar_res_id";
 
-    // ========== 地址表 ==========
     public static final String TABLE_ADDRESS = "address";
     public static final String COL_ADDR_ID = "_id";
     public static final String COL_ADDR_NAME = "name";
@@ -48,7 +45,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_ADDR_DETAIL = "detail";
     public static final String COL_ADDR_DEFAULT = "is_default";
 
-    // DDL: CREATE TABLE
+    // ==== DDL ====
     private static final String SQL_CREATE_USER =
             "CREATE TABLE IF NOT EXISTS " + TABLE_USER + " ("
                     + COL_USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -101,7 +98,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        Log.d(TAG, "=== DDL: 创建数据库表 ===");
+        Log.d(TAG, "=== DDL: 全新创建 ===");
         db.execSQL(SQL_CREATE_USER);
         db.execSQL(SQL_CREATE_CART);
         db.execSQL(SQL_CREATE_PROFILE);
@@ -110,7 +107,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        Log.d(TAG, "=== DDL: 升级 v" + oldVersion + " → v" + newVersion + " ===");
+        Log.w(TAG, "=== DDL: 升级 v" + oldVersion + " → v" + newVersion + " ===");
+        // 旧版user表用phone列,改为email列 → 删表重建(本地数据可丢弃)
+        if (oldVersion < 3) {
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER + ";");
+            db.execSQL(SQL_CREATE_USER);
+        }
         if (oldVersion < 2) {
             db.execSQL(SQL_CREATE_CART);
             db.execSQL(SQL_CREATE_PROFILE);

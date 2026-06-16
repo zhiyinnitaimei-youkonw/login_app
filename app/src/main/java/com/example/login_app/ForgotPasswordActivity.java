@@ -49,23 +49,18 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         MailSender.sendCode(email, generatedCode, new MailSender.Callback() {
             @Override
             public void onSuccess() {
-                runOnUiThread(() -> {
-                    Toast.makeText(ForgotPasswordActivity.this, "验证码已发送至邮箱", Toast.LENGTH_LONG).show();
-                    etSmsCode.requestFocus();
-                    btnGetCode.postDelayed(() -> btnGetCode.setEnabled(true), 60000);
-                });
+                Toast.makeText(ForgotPasswordActivity.this, "验证码已发送至邮箱", Toast.LENGTH_LONG).show();
+                etSmsCode.requestFocus();
+                btnGetCode.postDelayed(() -> btnGetCode.setEnabled(true), 60000);
             }
             @Override
             public void onError(String msg) {
-                runOnUiThread(() -> {
-                    btnGetCode.setEnabled(true);
-                    // 模拟回退
-                    new AlertDialog.Builder(ForgotPasswordActivity.this)
-                            .setTitle("邮件发送失败")
-                            .setMessage(msg + "\n\n(模拟)验证码: " + generatedCode)
-                            .setPositiveButton("确定", null).show();
-                    etSmsCode.requestFocus();
-                });
+                btnGetCode.setEnabled(true);
+                new AlertDialog.Builder(ForgotPasswordActivity.this)
+                        .setTitle("邮件发送失败")
+                        .setMessage(msg + "\n\n(模拟)验证码: " + generatedCode)
+                        .setPositiveButton("确定", null).show();
+                etSmsCode.requestFocus();
             }
         });
     }

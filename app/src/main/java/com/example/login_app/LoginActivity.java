@@ -146,20 +146,16 @@ public class LoginActivity extends AppCompatActivity {
         MailSender.sendCode(email, generatedCode, new MailSender.Callback() {
             @Override
             public void onSuccess() {
-                runOnUiThread(() -> {
-                    Toast.makeText(LoginActivity.this, "验证码已发送至邮箱，请查收", Toast.LENGTH_LONG).show();
-                    etRegCode.requestFocus();
-                    btnGetRegCode.postDelayed(() -> btnGetRegCode.setEnabled(true), 60000);
-                });
+                Toast.makeText(LoginActivity.this, "验证码已发送至邮箱，请查收", Toast.LENGTH_LONG).show();
+                etRegCode.requestFocus();
+                btnGetRegCode.postDelayed(() -> btnGetRegCode.setEnabled(true), 60000);
             }
 
             @Override
             public void onError(String msg) {
-                runOnUiThread(() -> {
-                    btnGetRegCode.setEnabled(true);
-                    showAlert("发送失败", "邮件发送失败\n" + msg + "\n\n(模拟)验证码: " + generatedCode);
-                    etRegCode.requestFocus();
-                });
+                btnGetRegCode.setEnabled(true);
+                showAlert("发送失败", "邮件发送失败\n" + msg + "\n\n(模拟)验证码: " + generatedCode);
+                etRegCode.requestFocus();
             }
         });
     }
