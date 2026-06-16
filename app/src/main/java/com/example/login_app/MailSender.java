@@ -63,8 +63,8 @@ public class MailSender {
                 Log.d(TAG, "邮件发送成功");
                 handler.post(callback::onSuccess);
 
-            } catch (Exception e) {
-                // 捕获所有异常(含MessagingException/NoClassDefFoundError等)
+            } catch (Throwable e) {
+                // 捕获Throwable(含Exception+Error: NoClassDefFoundError等)
                 StringWriter sw = new StringWriter();
                 e.printStackTrace(new PrintWriter(sw));
                 String trace = sw.toString();
@@ -72,10 +72,18 @@ public class MailSender {
 
                 String msg = e.getClass().getSimpleName() + ": " + e.getMessage();
                 if (msg == null || msg.isEmpty()) msg = e.getClass().getName();
-                // 截短显示
-                if (msg.length() > 150) msg = msg.substring(0, 150);
+                if (msg.length() > 200) msg = msg.substring(0, 200);
                 final String finalMsg = msg;
-                handler.post(() -> callback.onError(finalMsg + "\n\n(详见logcat)"));
+
+                // 写文件兜底(防止UI线程也崩)
+                try {
+                    java.io.FileOutputStream fos = new java.io.FileOutputStream(
+                            "/data/data/com.example.login_app/files/smtp_crash.log", true);
+                    fos.write(("=== SMTP Crash ===\n" + trace + "\n").getBytes());
+                    fos.close();
+                } catch (Exception ignored) {}
+
+                handler.post(() -> callback.onError(finalMsg));
             }
         }).start();
     }
