@@ -25,6 +25,9 @@ public class AddressListActivity extends AppCompatActivity {
 
         findViewById(R.id.iv_back).setOnClickListener(v -> finish());
 
+        // 从SQLite加载地址
+        AddressManager.getInstance().loadFromDb(this);
+
         listView = findViewById(R.id.list_address);
         adapter = new AddressAdapter();
         listView.setAdapter(adapter);
@@ -87,6 +90,7 @@ public class AddressListActivity extends AppCompatActivity {
                         .setMessage("确定要删除该地址吗？")
                         .setPositiveButton("确定", (dialog, which) -> {
                             AddressManager.getInstance().remove(addr.getId());
+                            AddressManager.getInstance().saveToDb(AddressListActivity.this);
                             notifyDataSetChanged();
                             Toast.makeText(AddressListActivity.this, "已删除", Toast.LENGTH_SHORT).show();
                         })
@@ -96,6 +100,7 @@ public class AddressListActivity extends AppCompatActivity {
 
             convertView.findViewById(R.id.lyt_default).setOnClickListener(v -> {
                 AddressManager.getInstance().setDefault(addr.getId());
+                AddressManager.getInstance().saveToDb(AddressListActivity.this);
                 notifyDataSetChanged();
             });
 

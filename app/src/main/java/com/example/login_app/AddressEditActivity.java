@@ -70,6 +70,7 @@ public class AddressEditActivity extends AppCompatActivity {
                     province, city, district, detail, false));
             Toast.makeText(this, "地址已保存", Toast.LENGTH_SHORT).show();
         }
+        AddressManager.getInstance().saveToDb(this);
         finish();
     }
 }

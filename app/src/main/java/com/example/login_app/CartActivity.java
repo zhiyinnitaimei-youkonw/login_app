@@ -1,5 +1,6 @@
 package com.example.login_app;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ListView;
@@ -30,6 +31,7 @@ public class CartActivity extends AppCompatActivity {
             @Override
             public void onQuantityChanged(int productId, int newQty) {
                 CartManager.getInstance().updateQuantity(productId, newQty);
+                CartManager.getInstance().saveToDb(CartActivity.this);
                 adapter.refresh();
                 updateTotal();
             }
@@ -37,6 +39,7 @@ public class CartActivity extends AppCompatActivity {
             @Override
             public void onItemRemoved(int productId) {
                 CartManager.getInstance().remove(productId);
+                CartManager.getInstance().saveToDb(CartActivity.this);
                 adapter.refresh();
                 updateTotal();
             }
@@ -47,9 +50,13 @@ public class CartActivity extends AppCompatActivity {
             if (CartManager.getInstance().getCount() == 0) {
                 Toast.makeText(this, "购物车为空", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(this, "合计: ¥" +
-                        String.format("%.2f", CartManager.getInstance().getTotal()) +
-                        "，结算功能开发中...", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(this, PaymentSuccessActivity.class);
+                intent.putExtra("product_name", "购物车结算");
+                intent.putExtra("quantity", CartManager.getInstance().getCount());
+                intent.putExtra("total", CartManager.getInstance().getTotal());
+                startActivity(intent);
+                CartManager.getInstance().clear();
+                CartManager.getInstance().saveToDb(CartActivity.this);
             }
         });
     }

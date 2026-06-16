@@ -25,15 +25,18 @@ public class ProductListActivity extends AppCompatActivity {
         gridView = findViewById(R.id.grid_products);
         tvCartBadge = findViewById(R.id.tv_cart_badge);
 
+        // 从SQLite恢复购物车
+        CartManager.getInstance().loadFromDb(this);
+
         initProducts();
         adapter = new ProductAdapter(this, products);
         gridView.setAdapter(adapter);
 
         gridView.setOnItemClickListener((parent, view, position, id) -> {
             Product p = products.get(position);
-            CartManager.getInstance().add(p);
-            updateBadge();
-            Toast.makeText(this, p.getName() + " 已加入购物车", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, ProductDetailActivity.class);
+            intent.putExtra("product", p);
+            startActivity(intent);
         });
 
         findViewById(R.id.btn_cart).setOnClickListener(v ->

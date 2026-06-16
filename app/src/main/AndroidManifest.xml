@@ -23,6 +23,8 @@
         <activity android:name=".UserProfileActivity" />
         <activity android:name=".AddressListActivity" />
         <activity android:name=".AddressEditActivity" />
+        <activity android:name=".ProductDetailActivity" />
+        <activity android:name=".PaymentSuccessActivity" />
     </application>
 
 </manifest>
