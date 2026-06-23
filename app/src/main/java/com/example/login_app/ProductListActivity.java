@@ -27,23 +27,28 @@ public class ProductListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shopping_channel);
 
-        tvCartBadge = findViewById(R.id.tv_cart_badge);
+        // ★ 公共标题栏（include引入）— 标题设为"商城"
+        View titleBar = findViewById(R.id.title_bar_include);
+        titleBar.findViewById(R.id.iv_back).setVisibility(View.GONE);
+        tvCartBadge = titleBar.findViewById(R.id.tv_cart_badge);
+        titleBar.findViewById(R.id.btn_title_cart).setOnClickListener(v ->
+                viewPager.setCurrentItem(1, true));
 
-        // 从SQLite恢复购物车
+        // 从SQLite恢复购物车 → 更新全局Application内存
         CartManager.getInstance().loadFromDb(this);
+        MainApplication app = (MainApplication) getApplication();
+        app.setCartCount(CartManager.getInstance().getCount());
 
         // 配置ViewPager2
         viewPager = findViewById(R.id.view_pager);
         adapter = new MainPagerAdapter(this);
         viewPager.setAdapter(adapter);
-        // 保留3个页面在内存中，避免频繁重建
         viewPager.setOffscreenPageLimit(2);
 
         // 配置TabLayout（底部导航）
         tabLayout = findViewById(R.id.tab_layout);
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
             tab.setText(TAB_TITLES[position]);
-            // 使用系统图标作为tab图标
             switch (position) {
                 case 0:
                     tab.setIcon(android.R.drawable.ic_menu_gallery);
@@ -67,25 +72,23 @@ public class ProductListActivity extends AppCompatActivity {
             }
         });
 
-        // 顶栏购物车图标点击 → 跳转到购物车Tab
-        findViewById(R.id.btn_top_cart).setOnClickListener(v -> viewPager.setCurrentItem(1, true));
-
         updateBadge();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        // 从全局内存读取购物车数量（不查库，性能优化）
         updateBadge();
-        // 刷新购物车Tab数据
         if (adapter != null && adapter.getCartFragment() != null) {
             adapter.getCartFragment().refreshCart();
         }
     }
 
-    /** 更新购物车角标 */
+    /** 更新购物车角标 — 从全局内存Application读取 */
     private void updateBadge() {
-        int count = CartManager.getInstance().getCount();
+        MainApplication app = (MainApplication) getApplication();
+        int count = app.getCartCount();
         if (count > 0) {
             tvCartBadge.setVisibility(View.VISIBLE);
             tvCartBadge.setText(String.valueOf(count));

@@ -5,31 +5,12 @@
     android:orientation="vertical"
     android:background="#F5F5F5">
 
-    <!-- Top bar -->
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:background="@color/primary"
-        android:padding="12dp">
+    <!-- ★ 公共标题栏 — include引入 -->
+    <include
+        android:id="@+id/title_bar_include"
+        layout="@layout/title_shopping"/>
 
-        <ImageView
-            android:id="@+id/iv_back"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:src="@android:drawable/ic_menu_revert"
-            android:layout_centerVertical="true"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="购物车"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:layout_centerInParent="true"/>
-    </RelativeLayout>
-
-    <!-- Cart list -->
+    <!-- Cart list — LinearLayout垂直排列（线性布局教学要点） -->
     <ListView
         android:id="@+id/list_cart"
         android:layout_width="match_parent"

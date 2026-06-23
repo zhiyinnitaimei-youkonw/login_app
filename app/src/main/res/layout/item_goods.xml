@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    商品网格单元布局 — 用于GridLayout中每个商品的展示
+    布局结构: 商品名称(上) → 商品图片(中) → 价格+添加按钮(下)
+
+    教学要点: 一个商场页面引用多个商品网格，一对多关系
+    复用步骤:
+      步骤一: 在商场页面布局中添加GridLayout节点
+      步骤二: 为本布局编写统一的商品信息布局
+      步骤三: 在Java代码中inflate此布局，按控件ID取出各控件对象
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/card_bg"
+    android:padding="8dp"
+    android:gravity="center">
+
+    <!-- 商品名称（上） -->
+    <TextView
+        android:id="@+id/tv_goods_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="@color/black"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:gravity="center"/>
+
+    <!-- 商品图片（中） -->
+    <ImageView
+        android:id="@+id/iv_goods_image"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:scaleType="centerInside"
+        android:background="#FFF5E6"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:contentDescription="商品图片"/>
+
+    <!-- 商品价格 + 添加按钮（下） -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/tv_goods_price"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="16sp"
+            android:textColor="#FF0000"
+            android:textStyle="bold"/>
+
+        <Button
+            android:id="@+id/btn_goods_add"
+            android:layout_width="60dp"
+            android:layout_height="32dp"
+            android:text="添加"
+            android:textSize="12sp"
+            android:textColor="@color/white"
+            android:backgroundTint="#FF6600"
+            android:padding="0dp"/>
+    </LinearLayout>
+
+</LinearLayout>

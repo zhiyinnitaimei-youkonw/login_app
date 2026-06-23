@@ -44,6 +44,7 @@ public class CartFragment extends Fragment {
                 CartManager.getInstance().saveToDb(requireContext());
                 adapter.refresh();
                 updateTotal();
+                syncCartCount();
             }
 
             @Override
@@ -52,6 +53,7 @@ public class CartFragment extends Fragment {
                 CartManager.getInstance().saveToDb(requireContext());
                 adapter.refresh();
                 updateTotal();
+                syncCartCount();
             }
         });
         listView.setAdapter(adapter);
@@ -60,13 +62,19 @@ public class CartFragment extends Fragment {
             if (CartManager.getInstance().getCount() == 0) {
                 Toast.makeText(getActivity(), "购物车为空", Toast.LENGTH_SHORT).show();
             } else {
+                // ★ 页面跳转: FLAG_ACTIVITY_CLEAR_TOP（关键代码分析-1）
                 Intent intent = new Intent(getActivity(), PaymentSuccessActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.putExtra("product_name", "购物车结算");
                 intent.putExtra("quantity", CartManager.getInstance().getCount());
                 intent.putExtra("total", CartManager.getInstance().getTotal());
                 startActivity(intent);
+
+                // 清空购物车 → 更新SQLite + 全局内存
                 CartManager.getInstance().clear();
                 CartManager.getInstance().saveToDb(requireContext());
+                MainApplication app = (MainApplication) requireActivity().getApplication();
+                app.resetCartCount();
                 adapter.refresh();
                 updateTotal();
             }
@@ -87,6 +95,12 @@ public class CartFragment extends Fragment {
     private void updateTotal() {
         double total = CartManager.getInstance().getTotal();
         tvTotal.setText("合计: ¥" + String.format("%.2f", total));
+    }
+
+    /** 同步购物车数量到全局内存Application */
+    private void syncCartCount() {
+        MainApplication app = (MainApplication) requireActivity().getApplication();
+        app.setCartCount(CartManager.getInstance().getCount());
     }
 
     /** 刷新购物车数据（外部调用，例如切换到该tab时） */

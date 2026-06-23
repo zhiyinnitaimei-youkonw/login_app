@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 公共标题栏 — 使用<include>标签引入到商城/购物车/详情页 -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="56dp"
+    android:background="@color/primary"
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp">
+
+    <!-- 返回箭头（默认隐藏，详情/购物车页设置为VISIBLE） -->
+    <ImageView
+        android:id="@+id/iv_back"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:src="@android:drawable/ic_menu_revert"
+        android:layout_centerVertical="true"
+        android:contentDescription="返回"
+        android:visibility="gone"/>
+
+    <!-- 页面标题 -->
+    <TextView
+        android:id="@+id/tv_title_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="商城"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_centerInParent="true"/>
+
+    <!-- 购物车图标 + 角标数字（相对布局定位在右上角） -->
+    <LinearLayout
+        android:id="@+id/btn_title_cart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:orientation="horizontal"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:padding="4dp">
+
+        <!-- 购物车图标 -->
+        <ImageView
+            android:id="@+id/iv_cart_icon"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@drawable/ic_cart"
+            android:contentDescription="购物车"/>
+
+        <!-- 商品数量角标（RelativeLayout实现位于图标右上角） -->
+        <TextView
+            android:id="@+id/tv_cart_badge"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:background="@drawable/badge_bg"
+            android:textColor="@color/white"
+            android:textSize="10sp"
+            android:gravity="center"
+            android:visibility="gone"/>
+    </LinearLayout>
+
+</RelativeLayout>

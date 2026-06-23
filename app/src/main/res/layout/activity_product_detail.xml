@@ -5,28 +5,10 @@
     android:orientation="vertical"
     android:background="#F5F5F5">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:background="@color/primary"
-        android:padding="12dp">
-
-        <ImageView
-            android:id="@+id/iv_back"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:src="@android:drawable/ic_menu_revert"
-            android:layout_centerVertical="true"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="商品详情"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:layout_centerInParent="true"/>
-    </RelativeLayout>
+    <!-- ★ 公共标题栏 — include引入（含购物车图标+角标） -->
+    <include
+        android:id="@+id/title_bar_include"
+        layout="@layout/title_shopping"/>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -44,7 +26,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="250dp"
                 android:scaleType="centerInside"
-                android:background="#FFF5E6"/>
+                android:background="#FFF5E6"
+                android:contentDescription="商品大图"/>
 
             <TextView
                 android:id="@+id/tv_detail_name"
