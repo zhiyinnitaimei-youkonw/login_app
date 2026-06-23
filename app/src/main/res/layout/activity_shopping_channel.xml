@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -21,69 +22,57 @@
             android:textStyle="bold"
             android:layout_centerVertical="true"/>
 
-        <!-- 右侧图标组：设置 + 购物车 -->
+        <!-- 购物车角标 -->
         <LinearLayout
+            android:id="@+id/btn_top_cart"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="4dp">
 
-            <LinearLayout
-                android:id="@+id/btn_user"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:padding="4dp">
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_cart"
+                android:contentDescription="购物车"/>
 
-                <ImageView
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:src="@android:drawable/ic_menu_myplaces"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/btn_cart"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:padding="4dp">
-
-                <ImageView
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:src="@drawable/ic_cart"/>
-
-                <TextView
-                    android:id="@+id/tv_cart_badge"
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:background="@drawable/badge_bg"
-                    android:textColor="@color/white"
-                    android:textSize="10sp"
-                    android:gravity="center"
-                    android:visibility="gone"/>
-            </LinearLayout>
+            <TextView
+                android:id="@+id/tv_cart_badge"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:background="@drawable/badge_bg"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                android:gravity="center"
+                android:visibility="gone"/>
         </LinearLayout>
     </RelativeLayout>
 
-    <!-- Product grid -->
-    <GridView
-        android:id="@+id/grid_products"
+    <!-- ViewPager2 — 支持左右滑动切换 -->
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/view_pager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:numColumns="2"
-        android:horizontalSpacing="8dp"
-        android:verticalSpacing="8dp"
-        android:padding="8dp"
-        android:clipToPadding="false"
-        android:stretchMode="columnWidth"/>
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <!-- 底部导航栏 -->
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@color/white"
+        android:elevation="8dp"
+        app:tabIndicatorColor="#FF6600"
+        app:tabIndicatorHeight="3dp"
+        app:tabSelectedTextColor="#FF6600"
+        app:tabTextColor="@color/gray"
+        app:tabRippleColor="#20FF6600"
+        app:tabMode="fixed"
+        app:tabGravity="fill"/>
 
 </LinearLayout>

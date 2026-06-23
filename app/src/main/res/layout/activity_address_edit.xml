@@ -16,7 +16,8 @@
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:src="@android:drawable/ic_menu_revert"
-            android:layout_centerVertical="true"/>
+            android:layout_centerVertical="true"
+            android:contentDescription="返回"/>
 
         <TextView
             android:id="@+id/tv_title"
@@ -33,55 +34,150 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:padding="16dp">
+        android:fillViewport="true"
+        android:padding="16dp"
+        android:descendantFocusability="beforeDescendants">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:background="@drawable/card_bg"
-            android:padding="16dp">
+            android:padding="16dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true">
 
-            <TextView android:text="收货人" android:textSize="14sp" android:textColor="@color/black"/>
-            <EditText android:id="@+id/et_name" android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:hint="请输入收货人姓名"
-                android:inputType="text" android:padding="12dp"
-                android:background="@drawable/edittext_bg" android:textSize="15sp"/>
+            <TextView
+                android:text="收货人"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                android:layout_marginBottom="4dp"/>
 
-            <TextView android:text="手机号码" android:textSize="14sp"
-                android:textColor="@color/black" android:layout_marginTop="16dp"/>
-            <EditText android:id="@+id/et_phone" android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:hint="请输入手机号码"
-                android:inputType="phone" android:padding="12dp"
-                android:background="@drawable/edittext_bg" android:textSize="15sp"/>
+            <EditText
+                android:id="@+id/et_name"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:hint="请输入收货人姓名"
+                android:inputType="textPersonName"
+                android:paddingHorizontal="12dp"
+                android:background="@drawable/edittext_bg"
+                android:textSize="15sp"
+                android:textColor="@color/black"
+                android:textColorHint="#AAAAAA"
+                android:maxLength="20"
+                android:singleLine="true"
+                android:importantForAutofill="no"/>
 
-            <TextView android:text="省" android:textSize="14sp"
-                android:textColor="@color/black" android:layout_marginTop="16dp"/>
-            <EditText android:id="@+id/et_province" android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:hint="请输入省份"
-                android:inputType="text" android:padding="12dp"
-                android:background="@drawable/edittext_bg" android:textSize="15sp"/>
+            <TextView
+                android:text="手机号码"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="4dp"/>
 
-            <TextView android:text="市" android:textSize="14sp"
-                android:textColor="@color/black" android:layout_marginTop="16dp"/>
-            <EditText android:id="@+id/et_city" android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:hint="请输入城市"
-                android:inputType="text" android:padding="12dp"
-                android:background="@drawable/edittext_bg" android:textSize="15sp"/>
+            <EditText
+                android:id="@+id/et_phone"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:hint="请输入11位手机号码"
+                android:inputType="phone"
+                android:paddingHorizontal="12dp"
+                android:background="@drawable/edittext_bg"
+                android:textSize="15sp"
+                android:textColor="@color/black"
+                android:textColorHint="#AAAAAA"
+                android:maxLength="11"
+                android:singleLine="true"
+                android:importantForAutofill="no"/>
 
-            <TextView android:text="区/县" android:textSize="14sp"
-                android:textColor="@color/black" android:layout_marginTop="16dp"/>
-            <EditText android:id="@+id/et_district" android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:hint="请输入区/县"
-                android:inputType="text" android:padding="12dp"
-                android:background="@drawable/edittext_bg" android:textSize="15sp"/>
+            <TextView
+                android:text="省"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="4dp"/>
 
-            <TextView android:text="详细地址" android:textSize="14sp"
-                android:textColor="@color/black" android:layout_marginTop="16dp"/>
-            <EditText android:id="@+id/et_detail" android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:hint="请输入详细地址，如街道、门牌号等"
-                android:inputType="text" android:padding="12dp"
-                android:background="@drawable/edittext_bg" android:textSize="15sp"/>
+            <EditText
+                android:id="@+id/et_province"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:hint="请输入省份，如：浙江省"
+                android:inputType="text"
+                android:paddingHorizontal="12dp"
+                android:background="@drawable/edittext_bg"
+                android:textSize="15sp"
+                android:textColor="@color/black"
+                android:textColorHint="#AAAAAA"
+                android:maxLength="20"
+                android:singleLine="true"
+                android:importantForAutofill="no"/>
+
+            <TextView
+                android:text="市"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="4dp"/>
+
+            <EditText
+                android:id="@+id/et_city"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:hint="请输入城市，如：杭州市"
+                android:inputType="text"
+                android:paddingHorizontal="12dp"
+                android:background="@drawable/edittext_bg"
+                android:textSize="15sp"
+                android:textColor="@color/black"
+                android:textColorHint="#AAAAAA"
+                android:maxLength="20"
+                android:singleLine="true"
+                android:importantForAutofill="no"/>
+
+            <TextView
+                android:text="区/县"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="4dp"/>
+
+            <EditText
+                android:id="@+id/et_district"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:hint="请输入区/县，如：余杭区"
+                android:inputType="text"
+                android:paddingHorizontal="12dp"
+                android:background="@drawable/edittext_bg"
+                android:textSize="15sp"
+                android:textColor="@color/black"
+                android:textColorHint="#AAAAAA"
+                android:maxLength="20"
+                android:singleLine="true"
+                android:importantForAutofill="no"/>
+
+            <TextView
+                android:text="详细地址"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="4dp"/>
+
+            <EditText
+                android:id="@+id/et_detail"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:hint="街道、门牌号等详细信息"
+                android:inputType="textPostalAddress"
+                android:paddingHorizontal="12dp"
+                android:background="@drawable/edittext_bg"
+                android:textSize="15sp"
+                android:textColor="@color/black"
+                android:textColorHint="#AAAAAA"
+                android:maxLength="100"
+                android:singleLine="true"
+                android:importantForAutofill="no"/>
+
         </LinearLayout>
     </ScrollView>
 
@@ -89,8 +185,9 @@
         android:id="@+id/btn_save"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:text="保存"
+        android:text="保存地址"
         android:textSize="16sp"
+        android:textColor="@color/white"
         android:backgroundTint="#FF6600"
         android:layout_margin="16dp"/>
 

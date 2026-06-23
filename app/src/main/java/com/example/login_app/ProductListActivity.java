@@ -1,57 +1,89 @@
 package com.example.login_app;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.GridView;
 import android.widget.TextView;
-import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import java.util.ArrayList;
-import java.util.List;
+import androidx.viewpager2.widget.ViewPager2;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 
+/**
+ * 主页面 — 底部导航 + ViewPager2滑动切换
+ * 3个Tab: 商城 | 购物车 | 我的
+ * 支持点击Tab切换和左右滑动切换
+ */
 public class ProductListActivity extends AppCompatActivity {
 
-    private GridView gridView;
+    private ViewPager2 viewPager;
+    private TabLayout tabLayout;
     private TextView tvCartBadge;
-    private ProductAdapter adapter;
-    private List<Product> products = new ArrayList<>();
+    private MainPagerAdapter adapter;
+
+    private static final String[] TAB_TITLES = {"商城", "购物车", "我的"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shopping_channel);
 
-        gridView = findViewById(R.id.grid_products);
         tvCartBadge = findViewById(R.id.tv_cart_badge);
 
         // 从SQLite恢复购物车
         CartManager.getInstance().loadFromDb(this);
 
-        initProducts();
-        adapter = new ProductAdapter(this, products);
-        gridView.setAdapter(adapter);
+        // 配置ViewPager2
+        viewPager = findViewById(R.id.view_pager);
+        adapter = new MainPagerAdapter(this);
+        viewPager.setAdapter(adapter);
+        // 保留3个页面在内存中，避免频繁重建
+        viewPager.setOffscreenPageLimit(2);
 
-        gridView.setOnItemClickListener((parent, view, position, id) -> {
-            Product p = products.get(position);
-            Intent intent = new Intent(this, ProductDetailActivity.class);
-            intent.putExtra("product", p);
-            startActivity(intent);
+        // 配置TabLayout（底部导航）
+        tabLayout = findViewById(R.id.tab_layout);
+        new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
+            tab.setText(TAB_TITLES[position]);
+            // 使用系统图标作为tab图标
+            switch (position) {
+                case 0:
+                    tab.setIcon(android.R.drawable.ic_menu_gallery);
+                    break;
+                case 1:
+                    tab.setIcon(R.drawable.ic_cart);
+                    break;
+                case 2:
+                    tab.setIcon(android.R.drawable.ic_menu_myplaces);
+                    break;
+            }
+        }).attach();
+
+        // ViewPager页面切换监听 — 切换到购物车时刷新数据
+        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                if (position == 1 && adapter.getCartFragment() != null) {
+                    adapter.getCartFragment().refreshCart();
+                }
+            }
         });
 
-        findViewById(R.id.btn_cart).setOnClickListener(v ->
-                startActivity(new Intent(this, CartActivity.class)));
+        // 顶栏购物车图标点击 → 跳转到购物车Tab
+        findViewById(R.id.btn_top_cart).setOnClickListener(v -> viewPager.setCurrentItem(1, true));
 
-        findViewById(R.id.btn_user).setOnClickListener(v ->
-                startActivity(new Intent(this, UserProfileActivity.class)));
+        updateBadge();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         updateBadge();
+        // 刷新购物车Tab数据
+        if (adapter != null && adapter.getCartFragment() != null) {
+            adapter.getCartFragment().refreshCart();
+        }
     }
 
+    /** 更新购物车角标 */
     private void updateBadge() {
         int count = CartManager.getInstance().getCount();
         if (count > 0) {
@@ -60,16 +92,5 @@ public class ProductListActivity extends AppCompatActivity {
         } else {
             tvCartBadge.setVisibility(View.GONE);
         }
-    }
-
-    private void initProducts() {
-        products.add(new Product(1, "无线蓝牙耳机", "降噪长续航 高品质音质", 199.00, R.drawable.ic_product));
-        products.add(new Product(2, "运动跑鞋", "透气减震 轻便舒适", 299.00, R.drawable.ic_product));
-        products.add(new Product(3, "双肩背包", "大容量 防水耐磨", 159.00, R.drawable.ic_product));
-        products.add(new Product(4, "保温杯", "316不锈钢 500ml", 89.00, R.drawable.ic_product));
-        products.add(new Product(5, "机械键盘", "青轴 RGB背光 87键", 349.00, R.drawable.ic_product));
-        products.add(new Product(6, "充电宝", "20000mAh 快充", 129.00, R.drawable.ic_product));
-        products.add(new Product(7, "遮阳帽", "防晒透气 可折叠", 49.00, R.drawable.ic_product));
-        products.add(new Product(8, "T恤", "纯棉 宽松版型 多色可选", 79.00, R.drawable.ic_product));
     }
 }
