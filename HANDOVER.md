@@ -194,4 +194,18 @@ LoginActivity (登录/注册)
 | **ViewHolder模式** | ProductAdapter/CartAdapter |
 | **Thread+Handler** | SMTP异步发送(替代AsyncTask) |
 | **Intent+startActivityForResult** | 页面参数传递(phone→new_password) |
-| **SMTP SSL 465** | QQ邮箱发送验证码 |
+| **SMTP SSL 465** | QQ邮箱发送验证码(凭据外部化) |
+
+---
+
+## 10. 凭据安全说明
+
+SMTP邮箱凭据 **不在Git历史中**（已通过 `git filter-branch` 清洗所有历史提交）。
+
+| 凭据 | 存储位置 | Git状态 |
+|------|---------|---------|
+| QQ邮箱账号密码 | `app/src/main/assets/mail.properties` | `.gitignore` 排除 |
+| GitHub Token | 本地 `git remote` | 不进入仓库 |
+| 配置模板 | `app/src/main/assets/mail.properties.template` | 已提交（无真实值） |
+
+**本地部署时**：复制 `mail.properties.template` → `mail.properties`，填入真实QQ邮箱授权码即可。
