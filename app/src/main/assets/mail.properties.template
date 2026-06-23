@@ -1,0 +1,6 @@
+# SMTP邮箱配置模板 — 复制为 mail.properties 并填入真实信息
+# mail.properties 已在 .gitignore 中排除
+mail.smtp.host=smtp.qq.com
+mail.smtp.port=465
+mail.sender.email=your_email@qq.com
+mail.sender.password=your_auth_code
